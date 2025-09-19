@@ -1,27 +1,32 @@
-name: Create Text File in GitHub Repo
+trigger:
+  branches:
+    include:
+      - main  # Or your target branch
 
-on:
-  workflow_dispatch:
+pool:
+  vmImage: ubuntu-latest
 
-jobs:
-  create-text-file:
-    runs-on: ubuntu-latest
-    steps:
-      # Step 1: Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v2
+steps:
+  # Step 1: Checkout the code
+  - checkout: self
 
-      # Step 2: Create a new text file
-      - name: Create a text file
-        run: |
-          echo "This is a new text file created by GitHub Actions!" > newfile.txt
-          cat newfile.txt  # Optional: Check the file content
+  # Step 2: Create a new file
+  - script: |
+      echo "This file was created by Azure Pipelines!" > newfile.txt
+      cat newfile.txt
+    displayName: "Create new file"
 
-      # Step 3: Commit the new file
-      - name: Commit and push the file
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add newfile.txt
-          git commit -m "Create new text file via GitHub Actions"
-          git push origin main
+  # Step 3: Configure Git
+  - script: |
+      git config user.email "build-agent@azuredevops.com"
+      git config user.name "Azure DevOps Pipeline"
+    displayName: "Configure Git"
+
+  # Step 4: Commit and push
+  - script: |
+      git add newfile.txt
+      git commit -m "Add new file via Azure Pipeline" || echo "Nothing to commit"
+      git push origin HEAD:main
+    displayName: "Commit and push file"
+    env:
+      GIT_AUTHORIZATION: $(System.AccessToken)
