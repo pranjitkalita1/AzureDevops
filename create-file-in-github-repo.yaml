@@ -1,9 +1,7 @@
 name: Create Text File in GitHub Repo
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   create-text-file:
