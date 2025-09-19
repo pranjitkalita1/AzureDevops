@@ -1,30 +1,29 @@
-trigger:
-  - none
-pr: none
-  
+name: Create Text File in GitHub Repo
 
-pool:
-  name: 'az-weu-ubuntu-22.04-amd64-2cpu'
+on:
+  push:
+    branches:
+      - main
 
-steps:
-  - checkout: self
-    submodules: true
-    persistCredentials: true
-    clean: true
+jobs:
+  create-text-file:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '14.x'
+      # Step 2: Create a new text file
+      - name: Create a text file
+        run: |
+          echo "This is a new text file created by GitHub Actions!" > newfile.txt
+          cat newfile.txt  # Optional: Check the file content
 
-  - task: AzureKeyVault@2
-    displayName: Azure Key Vault
-    inputs:
-      azureSubscription: '#####'
-      KeyVaultName: '####'
-      SecretsFilter: '*'
-      RunAsPreJob: false  
-
-  
-
-  
-  
+      # Step 3: Commit the new file
+      - name: Commit and push the file
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add newfile.txt
+          git commit -m "Create new text file via GitHub Actions"
+          git push origin main
